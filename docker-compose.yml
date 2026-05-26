@@ -1,0 +1,64 @@
+services:
+  auth-service:
+    build: ./AuthService
+    container_name: auth-service
+    ports:
+      - "5001:8080"
+    depends_on:
+      - auth-db 
+
+  product-service:
+    build: ./ProductService
+    container_name: product-service
+    ports:
+      - "5002:8080"
+    depends_on:
+      - auth-db
+      - redis
+
+  category-service:
+    build: ./CategoryService
+    container_name: category-service
+    ports:
+      - "5003:8080"
+    depends_on:
+      - auth-db
+
+  cart-service:
+    build: ./CartService
+    container_name: cart-service
+    ports:
+      - "5004:8080"
+    depends_on:
+      - auth-db
+      - product-service
+
+  order-service:
+    build: ./OrderService
+    container_name: order-service
+    ports:
+      - "5005:8080"
+    depends_on:
+      - auth-db
+      - product-service
+      - cart-service
+
+  auth-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: auth-db
+    environment:
+      SA_PASSWORD: "Difficult_password123"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  sql_data:
