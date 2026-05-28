@@ -1,5 +1,5 @@
-﻿using AuthService.Services.Interface;
-using Microsoft.AspNetCore.Identity;
+﻿using AuthService.Models;
+using AuthService.Services.Interface;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -15,7 +15,7 @@ namespace AuthService.Services
             _config = config;
         }
 
-        public string CreateToken(IdentityUser user, IList<string> roles)
+        public string CreateToken(ApplicationUser user, IList<string> roles)
         {
             var claims = new List<Claim>
             {

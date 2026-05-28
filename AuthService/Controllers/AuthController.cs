@@ -2,6 +2,7 @@
 using AuthService.Services.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using AuthService.Models;
 
 namespace AuthService.Controllers
 {
@@ -9,10 +10,10 @@ namespace AuthService.Controllers
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITokenService _tokenService;
 
-        public AuthController(UserManager<IdentityUser> userManager, ITokenService tokenService)
+        public AuthController(UserManager<ApplicationUser> userManager, ITokenService tokenService)
         {
             _userManager = userManager;
             _tokenService = tokenService;
@@ -21,7 +22,7 @@ namespace AuthService.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
-            var user = new IdentityUser
+            var user = new ApplicationUser
             {
                 UserName = dto.Email,
                 Email = dto.Email

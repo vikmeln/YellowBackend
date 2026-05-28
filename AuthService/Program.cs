@@ -9,16 +9,35 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
 using System.Text;
+using Amazon;
+using Amazon.S3;
+using AuthService.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AuthDbContext>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+
+builder.Services.AddSingleton<IAmazonS3>(serviceProvider =>
+{
+    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+
+    var regionName =
+        configuration["AWS:Region"] ??
+        configuration["AWS_REGION"] ??
+        "us-east-1";
+
+    var region = RegionEndpoint.GetBySystemName(regionName);
+
+    return new AmazonS3Client(region);
+});
+
+builder.Services.AddScoped<IAvatarStorageService, S3AvatarStorageService>();
 
 builder.Services.AddAuthentication(options =>
 {

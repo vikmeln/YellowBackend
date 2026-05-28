@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AuthService.Models;
 
 namespace AuthService.Services.Interface
 {
     public interface ITokenService
     {
-        string CreateToken(IdentityUser user, IList<string> roles);
+        string CreateToken(ApplicationUser user, IList<string> roles);
     }
 }

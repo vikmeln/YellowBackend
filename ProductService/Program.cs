@@ -7,13 +7,26 @@ using ProductService.Middlewares;
 using ProductService.Services;
 using ProductService.Services.Interface;
 using System.Text;
-using Microsoft.Extensions.Caching.StackExchangeRedis;
+using Amazon;
+using Amazon.S3;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ProductDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IProductService, Productservice>();
+
+builder.Services.AddSingleton<IAmazonS3>(serviceProvider =>
+{
+    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+
+    var regionName = configuration["AWS:Region"] ?? "us-east-1";
+    var region = RegionEndpoint.GetBySystemName(regionName);
+
+    return new AmazonS3Client(region);
+});
+
+builder.Services.AddScoped<IFileStorageService, S3FileStorageService>();
 
 builder.Services.AddHttpClient("CategoryService", client =>
 {

@@ -10,10 +10,27 @@ namespace ProductService.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _service;
+        private readonly IFileStorageService _fileStorageService;
 
-        public ProductsController(IProductService service)
+        public ProductsController(
+            IProductService service,
+            IFileStorageService fileStorageService
+        )
         {
             _service = service;
+            _fileStorageService = fileStorageService;
+        }
+
+        [HttpPost("upload-url")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateUploadUrl(CreateUploadUrlDto dto)
+        {
+            var result = await _fileStorageService.CreateProductImageUploadUrlAsync(
+                dto.FileName,
+                dto.ContentType
+            );
+
+            return Ok(result);
         }
 
         [HttpGet]
